@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qarz Qo'shish - Qarz Boshqaruvi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .currency {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            padding-right: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'home' %}" class="back-btn">← Bosh sahifaga qaytish</a>
+
+        <header>
+            <h1>➕ Yangi Contact Qo'shish</h1>
+        </header>
+
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                ✅ Qarz muvaffaqiyatli qo'shildi!
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                ❌ Xatolik yuz berdi. Iltimos, barcha maydonlarni to'ldiring.
+            </div>
+
+            <form id="debtForm" action="{% url 'contact-form' %}" method="post">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="debtor">To'liq ismi <span class="required">*</span></label>
+                        <input type="text" id="debtor" name="fullname" required placeholder="Masalan: Ahmad Karimov">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Telefon raqami</label>
+                    <input type="tel" id="phone" name="phone_number" placeholder="+998 90 123 45 67">
+                </div>
+
+                <button type="submit" class="btn">💾 Contactni Saqlash</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Bugungi sanani default qilib qo'yish
+        document.getElementById('date').valueAsDate = new Date();
+
+        document.getElementById('debtForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const debtData = {
+                id: Date.now(),
+                debtor: formData.get('debtor'),
+                amount: parseFloat(formData.get('amount')),
+                date: formData.get('date'),
+                dueDate: formData.get('dueDate') || null,
+                phone: formData.get('phone') || '',
+                category: formData.get('category'),
+                notes: formData.get('notes') || '',
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+
+            // Validatsiya
+            if (!debtData.debtor || !debtData.amount || !debtData.date) {
+                showError('Iltimos, barcha majburiy maydonlarni to\'ldiring!');
+                return;
+            }
+
+            if (debtData.amount <= 0) {
+                showError('Qarz miqdori 0 dan katta bo\'lishi kerak!');
+                return;
+            }
+
+            // Ma'lumotlarni saqlash
+            let debts = JSON.parse(localStorage.getItem('debts')) || [];
+            debts.push(debtData);
+            localStorage.setItem('debts', JSON.stringify(debts));
+
+            showSuccess();
+            this.reset();
+            document.getElementById('date').valueAsDate = new Date();
+        });
+
+        function showSuccess() {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'block';
+
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+        }
+
+        function showError(message) {
+            const successMsg = document.getElementById('successMessage');
+            const errorMsg = document.getElementById('errorMessage');
+
+            successMsg.style.display = 'none';
+            errorMsg.style.display = 'block';
+            errorMsg.innerHTML = '❌ ' + message;
+
+            setTimeout(() => {
+                errorMsg.style.display = 'none';
+            }, 5000);
+        }
+
+        // Telefon raqamini formatlash
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('998')) {
+                value = value.substring(3);
+            }
+            if (value.length > 0) {
+                if (value.length <= 2) {
+                    value = `+998 ${value}`;
+                } else if (value.length <= 5) {
+                    value = `+998 ${value.substring(0, 2)} ${value.substring(2)}`;
+                } else if (value.length <= 8) {
+                    value = `+998 ${value.substring(0, 2)} ${value.substring(2, 5)} ${value.substring(5)}`;
+                } else {
+                    value = `+998 ${value.substring(0, 2)} ${value.substring(2, 5)} ${value.substring(5, 7)} ${value.substring(7, 9)}`;
+                }
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

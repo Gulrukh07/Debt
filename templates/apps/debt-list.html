@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qarzlar Ro'yxati - Qarz Boshqaruvi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-group {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .filter-select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 120px;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .debt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .debt-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .debt-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .debt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .debtor-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .debt-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .debt-info {
+            margin-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-overdue {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .debt-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            background: white;
+            padding: 60px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-group {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .debt-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .category-icon {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="{% url 'home' %}" class="back-btn">← Bosh sahifaga qaytish</a>
+
+    <header>
+        <h1>📋 Qarzlar Ro'yxati</h1>
+    </header>
+
+    <div class="controls">
+        <form class="search-group" action="{% url 'debt-list' %}" method="post">
+            {% csrf_token %}
+            <div class="search-group">
+                <input type="text" class="search-input" id="searchInput" name="search"
+                       placeholder="Qarzdor ismini qidiring...">
+                <select class="filter-select" id="statusFilter" name="status">
+                    <option value="all">Barcha holat</option>
+                    {% for status in status_list %}
+                        <option value="{{ status }}">{{ status }}</option>
+                    {% endfor %}
+
+                </select>
+                <select class="filter-select" id="categoryFilter" name="category">
+                    <option value="-1">Barcha turlar</option>
+                    {% for category in categories %}
+                        <option value="{{ category.pk }}">{{ category.name }}</option>
+
+                    {% endfor %}
+
+                </select>
+            </div>
+            <button class='add-btn' type="submit">Filter</button>
+            <a href="{% url 'debt-form' %}" class="add-btn">+ Yangi Qarz</a>
+        </form>
+    </div>
+
+    <div class="debt-grid">
+        {% for debt in debts %}
+            <div class="debt-card">
+                <div class="debt-header">
+                    <div class="debtor-name">{{ debt.contact.fullname }}</div>
+                    <div class="debt-amount">{{ debt.amount }}</div>
+                </div>
+
+                <div class="debt-info">
+                    <div class="info-row">
+                        <span>📅 Berilgan sana:</span>
+                        <span>{{ debt.given_date }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>⏰ Qaytarish sanasi:</span>
+                        <span>{{ debt.due_date }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>💰 To'langan:</span>
+                        <span class="text-success">100000</span>
+                    </div>
+                    <div class="info-row">
+                        <span>💸 Qolgan:</span>
+                        <span class="text-danger">1000</span>
+                    </div>
+                    <div class="info-row">
+                        <span><img src="{{ debt.category.icon }}" alt=""> Turi: </span>
+                        <span>{{ debt.category.name }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span>📞 Telefon:</span>
+                        <span><a href="tel:{{ debt.contact.phone_number }}">{{ debt.contact.phone_number }}</a></span>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <span>Status</span>
+                    <span>{{ debt.status }}</span>
+                </div>
+
+                <p style="margin-top: 10px; font-style: italic; color: #666;">💬 {{ debt.description }}</p>
+
+                <div class="debt-actions">
+                    <a href="{% url 'payment-history' %}">
+                        <button class="btn btn-success">
+                            💳 To'lov
+                        </button>
+                    </a>
+                    <button class="btn btn-primary">
+                        👁️ Batafsil
+                    </button>
+                        <form action="{% url 'debt-delete' debt.pk%}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">🗑️</button>
+
+                        </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="empty-state" style="display: none;">
+        <div class="empty-icon">📝</div>
+        <h3>Hozircha qarzlar yo'q</h3>
+        <p>Yangi qarz qo'shish uchun yuqoridagi tugmani bosing</p>
+    </div>
+</div>
+
+<!-- To'lov modali -->
+<div class="modal" id="paymentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>💳 To'lov Qilish</h3>
+            <p id="paymentDebtorName"></p>
+        </div>
+        <div class="form-group">
+            <label>To'lov miqdori (so'm):</label>
+            <input type="number" id="paymentAmount" min="1" placeholder="0">
+            <small>Qolgan qarz: <span id="remainingAmount"></span></small>
+        </div>
+        <div class="form-group">
+            <label>To'lov sanasi:</label>
+            <input type="date" id="paymentDate">
+        </div>
+        <div class="form-group">
+            <label>Izoh:</label>
+            <textarea id="paymentNote" placeholder="To'lov haqida izoh..."></textarea>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-success" onclick="processPayment()">To'lash</button>
+            <button class="btn" onclick="closeModal()">Bekor qilish</button>
+        </div>
+    </div>
+</div>
+
+<!-- O'chirish tasdiqi modali -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🗑️ Qarzni O'chirish</h3>
+            <p>Haqiqatan ham bu qarzni o'chirmoqchimisiz?</p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-danger" onclick="confirmDelete()">O'chirish</button>
+            <button class="btn" onclick="closeModal()">Bekor qilish</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let debts = JSON.parse(localStorage.getItem('debts')) || [];
+    let payments = JSON.parse(localStorage.getItem('payments')) || [];
+    let currentDebtId = null;
+
+    // Sahifa yuklanganda
+    {#window.onload = function () {#}
+    {#    displayDebts();#}
+    {#    setupEventListeners();#}
+    {#    document.getElementById('paymentDate').valueAsDate = new Date();#}
+
+    
+
+    function setupEventListeners() {
+        document.getElementById('searchInput').addEventListener('input', filterDebts);
+        document.getElementById('statusFilter').addEventListener('change', filterDebts);
+        document.getElementById('categoryFilter').addEventListener('change', filterDebts);
+    }
+
+    function displayDebts(debtsToShow = debts) {
+        const grid = document.getElementById('debtGrid');
+        const emptyState = document.getElementById('emptyState');
+
+        if (debtsToShow.length === 0) {
+            grid.style.display = 'none';
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        grid.style.display = 'grid';
+        emptyState.style.display = 'none';
+
+        grid.innerHTML = debtsToShow.map(debt => {
+            const paidAmount = getPaidAmount(debt.id);
+            const remainingAmount = debt.amount - paidAmount;
+            const status = getDebtStatus(debt, remainingAmount);
+            const categoryIcon = getCategoryIcon(debt.category);
+
+            return `
+                    <div class="debt-card">
+                        <div class="debt-header">
+                            <div class="debtor-name">${debt.debtor}</div>
+                            <div class="debt-amount">${formatMoney(debt.amount)}</div>
+                        </div>
+
+                        <div class="debt-info">
+                            <div class="info-row">
+                                <span>📅 Berilgan sana:</span>
+                                <span>${formatDate(debt.date)}</span>
+                            </div>
+                            ${debt.dueDate ? `
+                                <div class="info-row">
+                                    <span>⏰ Qaytarish sanasi:</span>
+                                    <span>${formatDate(debt.dueDate)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="info-row">
+                                <span>💰 To'langan:</span>
+                                <span class="text-success">${formatMoney(paidAmount)}</span>
+                            </div>
+                            <div class="info-row">
+                                <span>💸 Qolgan:</span>
+                                <span class="text-danger">${formatMoney(remainingAmount)}</span>
+                            </div>
+                            <div class="info-row">
+                                <span>${categoryIcon} Turi:</span>
+                                <span>${getCategoryName(debt.category)}</span>
+                            </div>
+                            ${debt.phone ? `
+                                <div class="info-row">
+                                    <span>📞 Telefon:</span>
+                                    <span>${debt.phone}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="status-badge status-${status.class}">${status.text}</div>
+
+                        ${debt.notes ? `<p style="margin-top: 10px; font-style: italic; color: #666;">💬 ${debt.notes}</p>` : ''}
+
+                        <div class="debt-actions">
+                            ${remainingAmount > 0 ? `
+                                <button class="btn btn-success" onclick="openPaymentModal(${debt.id})">
+                                    💳 To'lov
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-primary" onclick="viewDetails(${debt.id})">
+                                👁️ Batafsil
+                            </button>
+                            <button class="btn btn-danger" onclick="openDeleteModal(${debt.id})">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `;
+        }).join('');
+    }
+
+    function filterDebts() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value;
+        const categoryFilter = document.getElementById('categoryFilter').value;
+
+        let filteredDebts = debts.filter(debt => {
+            const matchesSearch = debt.debtor.toLowerCase().includes(searchTerm);
+            const matchesCategory = categoryFilter === 'all' || debt.category === categoryFilter;
+
+            let matchesStatus = true;
+            if (statusFilter !== 'all') {
+                const paidAmount = getPaidAmount(debt.id);
+                const remainingAmount = debt.amount - paidAmount;
+                const status = getDebtStatus(debt, remainingAmount);
+                matchesStatus = status.class === statusFilter;
+            }
+
+            return matchesSearch && matchesCategory && matchesStatus;
+        });
+
+        displayDebts(filteredDebts);
+    }
+
+    function getPaidAmount(debtId) {
+        return payments
+            .filter(payment => payment.debtId === debtId)
+            .reduce((sum, payment) => sum + payment.amount, 0);
+    }
+
+    function getDebtStatus(debt, remainingAmount) {
+        if (remainingAmount <= 0) {
+            return {class: 'paid', text: 'To\'langan'};
+        }
+
+        if (debt.dueDate && new Date(debt.dueDate) < new Date()) {
+            return {class: 'overdue', text: 'Muddati o\'tgan'};
+        }
+
+        return {class: 'active', text: 'Faol'};
+    }
+
+    function getCategoryIcon(category) {
+        const icons = {
+            personal: '👤',
+            business: '💼',
+            family: '👨‍👩‍👧‍👦',
+            friend: '👥',
+            other: '📝'
+        };
+        return icons[category] || '📝';
+    }
+
+    function getCategoryName(category) {
+        const names = {
+            personal: 'Shaxsiy',
+            business: 'Biznes',
+            family: 'Oilaviy',
+            friend: 'Do\'st',
+            other: 'Boshqa'
+        };
+        return names[category] || 'Boshqa';
+    }
+
+    function formatMoney(amount) {
+        return new Intl.NumberFormat('uz-UZ').format(amount) + ' so\'m';
+    }
+
+    function formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('uz-UZ');
+    }
+
+    function openPaymentModal(debtId) {
+        const debt = debts.find(d => d.id === debtId);
+        const paidAmount = getPaidAmount(debtId);
+        const remainingAmount = debt.amount - paidAmount;
+
+        currentDebtId = debtId;
+        document.getElementById('paymentDebtorName').textContent = debt.debtor;
+        document.getElementById('remainingAmount').textContent = formatMoney(remainingAmount);
+        document.getElementById('paymentAmount').max = remainingAmount;
+        document.getElementById('paymentAmount').value = remainingAmount;
+        document.getElementById('paymentModal').style.display = 'block';
+    }
+
+    function processPayment() {
+        const amount = parseFloat(document.getElementById('paymentAmount').value);
+        const date = document.getElementById('paymentDate').value;
+        const note = document.getElementById('paymentNote').value;
+
+        if (!amount || amount <= 0 || !date) {
+            alert('Iltimos, barcha maydonlarni to\'ldiring!');
+            return;
+        }
+
+        const debt = debts.find(d => d.id === currentDebtId);
+        const paidAmount = getPaidAmount(currentDebtId);
+        const remainingAmount = debt.amount - paidAmount;
+
+        if (amount > remainingAmount) {
+            alert('To\'lov miqdori qolgan qarzdan ko\'p bo\'lishi mumkin emas!');
+            return;
+        }
+
+        const payment = {
+            id: Date.now(),
+            debtId: currentDebtId,
+            payer: debt.debtor,
+            amount: amount,
+            date: date,
+            note: note,
+            createdAt: new Date().toISOString()
+        };
+
+        payments.push(payment);
+        localStorage.setItem('payments', JSON.stringify(payments));
+
+        closeModal();
+        displayDebts();
+        alert('To\'lov muvaffaqiyatli qo\'shildi!');
+    }
+
+    function openDeleteModal(debtId) {
+        currentDebtId = debtId;
+        document.getElementById('deleteModal').style.display = 'block';
+    }
+
+    function confirmDelete() {
+        debts = debts.filter(debt => debt.id !== currentDebtId);
+        payments = payments.filter(payment => payment.debtId !== currentDebtId);
+
+        localStorage.setItem('debts', JSON.stringify(debts));
+        localStorage.setItem('payments', JSON.stringify(payments));
+
+        closeModal();
+        displayDebts();
+        filterDebts();
+    }
+
+    function viewDetails(debtId) {
+        window.location.href = `debt-details.html?id=${debtId}`;
+    }
+
+    function closeModal() {
+        document.getElementById('paymentModal').style.display = 'none';
+        document.getElementById('deleteModal').style.display = 'none';
+        document.getElementById('paymentAmount').value = '';
+        document.getElementById('paymentNote').value = '';
+        currentDebtId = null;
+    }
+
+    // Modal tashqarisini bosganda yopish
+    window.onclick = function (event) {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    }
+</script>
+</body>
+</html>
+
+
