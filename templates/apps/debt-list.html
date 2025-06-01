@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uz">
+{%  load humanize %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -329,7 +330,7 @@
             <div class="debt-card">
                 <div class="debt-header">
                     <div class="debtor-name">{{ debt.contact.fullname }}</div>
-                    <div class="debt-amount">{{ debt.amount }}</div>
+                    <div class="debt-amount">{{ debt.amount |intcomma }}</div>
                 </div>
 
                 <div class="debt-info">
@@ -343,11 +344,11 @@
                     </div>
                     <div class="info-row">
                         <span>💰 To'langan:</span>
-                        <span class="text-success">100000</span>
+                        <span class="text-success">{{ debt.total_amount | intcomma}}</span>
                     </div>
                     <div class="info-row">
                         <span>💸 Qolgan:</span>
-                        <span class="text-danger">1000</span>
+                        <span class="text-danger">{{ debt.left_amount |intcomma}}</span>
                     </div>
                     <div class="info-row">
                         <span><img src="{{ debt.category.icon }}" alt=""> Turi: </span>

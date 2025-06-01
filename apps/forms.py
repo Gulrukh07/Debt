@@ -1,8 +1,10 @@
 import re
+from calendar import month
 
-from django.forms.fields import CharField
+from django.forms.fields import CharField, DateField
 from django.forms.forms import Form
 from django.forms.models import ModelForm
+from django.forms.widgets import DateInput
 
 from apps.models import Debt, Contact
 
@@ -28,4 +30,4 @@ class DebtFilterForm(Form):
 
 class PaymentFilterForm(Form):
     search = CharField(max_length=255 ,required=False)
-    month = CharField(max_length=10, required=False)
+    month = DateField(widget=DateInput(attrs={'type':month}), required=False)

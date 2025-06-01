@@ -1,6 +1,7 @@
+import csv
 
-from django.db.models import Q, Sum
-from django.db.models.functions import TruncMonth
+from django.db.models import Q, Sum, ExpressionWrapper, F, DecimalField, Count
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -8,8 +9,21 @@ from django.views.generic import CreateView, ListView, FormView, DeleteView
 
 from apps.forms import DebtModelForm, ContactModelForm, DebtFilterForm, PaymentFilterForm
 from apps.models import Debt, Contact, Category, Payment
-import csv
-from django.http import HttpResponse
+from root.settings import MAX_DIGITS, DECIMAL_PLACE
+
+
+class HomeDataView(ListView):
+    queryset = Debt.objects.all()
+    context_object_name = 'home'
+    template_name = 'apps/home.html'
+
+    def get_context_data(self, *args, **kwargs):
+        data = super().get_context_data(*args, **kwargs)
+        data['total_debts'] = Debt.objects.aggregate(total=Sum('amount'))['total'] or 0
+        data['total_paid'] = Payment.objects.aggregate(total=Sum('amount'))['total'] or 0
+        data['counts'] = Debt.objects.aggregate(count=Count('id'))['count'] or 0
+        data['total_left'] = data['total_debts'] - data['total_paid']
+        return data
 
 
 class DebtFormCreateView(CreateView):
@@ -39,6 +53,13 @@ class DebtListView(ListView, FormView):
     template_name = 'apps/debt-list.html'
     success_url = reverse_lazy('debt-list')
 
+    def get_queryset(self):
+        return Debt.objects.prefetch_related('payments').annotate(
+            total_amount = Sum('payments__amount'),
+            left_amount=ExpressionWrapper(F('amount')- F('total_amount'),
+                                      output_field=DecimalField(max_digits=MAX_DIGITS,decimal_places=DECIMAL_PLACE))
+        )
+
     def form_valid(self, form):
         search = form.cleaned_data.get('search')
         status = form.cleaned_data.get('status')
@@ -56,6 +77,7 @@ class DebtListView(ListView, FormView):
         data['debts'] = query
         data['status_list'] = Debt.StatusType.values
         data['categories'] = Category.objects.all()
+        data['payment'] = Payment.objects.all()
 
         return render(self.request, 'apps/debt-list.html', context=data)
 
@@ -66,42 +88,57 @@ class DebtListView(ListView, FormView):
 
         return data
 
+
 class DebtDeleteView(DeleteView):
     queryset = Debt.objects.all()
     template_name = 'apps/debt-list.html'
     success_url = reverse_lazy('debt-list')
     pk_url_kwarg = 'pk'
 
-class PaymentListView(ListView, FormView):
+
+class PaymentListView(ListView):
     queryset = Payment.objects.all()
     context_object_name = 'payments'
     template_name = 'apps/payment.html'
     form_class = PaymentFilterForm
     success_url = reverse_lazy('payment-history')
 
-    def get_context_data(self, *args, **kwargs):
-        data = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
         data['debts'] = Debt.objects.all()
         data['count'] = Payment.objects.count()
         data['total'] = Payment.objects.aggregate(total=Sum('amount'))['total'] or 0
         now = timezone.now()
-        start_of_month = now.replace(day=1,hour=0,minute=0,second=0,microsecond=0)
-        monthly_total = Payment.objects.filter(created_at__gte=start_of_month).aggregate(total=Sum('amount'))['total'] or 0
+        start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        monthly_total = Payment.objects.filter(created_at__gte=start_of_month).aggregate(total=Sum('amount'))[
+                            'total'] or 0
         data['month'] = monthly_total
-
         return data
 
-    def form_valid(self, form):
-        month = form.cleaned_data.get('month')
-        search = form.cleaned_data.get('search')
+    def get_queryset(self):
+        return Payment.objects.select_related('debt').annotate(
+            left_amount=ExpressionWrapper(
+                F('debt__amount') - F('amount'),
+                output_field=DecimalField(max_digits=MAX_DIGITS,decimal_places=DECIMAL_PLACE)
+            )
+        )
+
+
+    def post(self, request):
+        month = request.POST.get('month')
+        search = request.POST.get('search')
+        context = {}
 
         query = Payment.objects.all()
+        if month:
+            query = query.filter(created_at__month=month)
         if search:
-            months = Payment.objects.annotate(months=TruncMonth('created_at'))
-            query = query.filter(months_icontains =month)
+            query = query.filter(
+                Q(debt__contact__fullname__icontains=search) | Q(debt__contact__phone_number__icontains=search))
 
-    def form_invalid(self, form):
-        pass
+        context['payments'] = query
+
+        return render(request, template_name='apps/payment.html', context=context)
 
 
 class PaymentDeleteView(DeleteView):
@@ -109,6 +146,7 @@ class PaymentDeleteView(DeleteView):
     template_name = 'apps/payment.html'
     success_url = reverse_lazy('payment-history')
     pk_url_kwarg = 'pk'
+
 
 def export_payments_csv(request):
     response = HttpResponse(content_type='text/csv')
@@ -130,11 +168,3 @@ def export_payments_csv(request):
         ])
 
     return response
-
-
-
-
-
-
-
-

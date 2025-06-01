@@ -13,7 +13,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MAX_DIGITS=15
+DECIMAL_PLACE=2
+
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.humanize',
     'django.contrib.auth',

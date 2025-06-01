@@ -1,10 +1,12 @@
 from django.db.models import Model, CharField, SlugField, DecimalField, DateField, TextField, ForeignKey, CASCADE, \
     DateTimeField, SET_NULL
 from django.db.models.enums import TextChoices
+from django.db.models.fields import URLField
 from django.utils.text import slugify
 
 
 class Category(Model):
+    icon =URLField()
     name = CharField(max_length=255)
     slug = SlugField()
 
@@ -17,10 +19,15 @@ class Category(Model):
         self.slug = slug
         return super().save(*args, **kwargs)
 
+    def __repr__(self):
+        return self.name
+
 
 class Contact(Model):
     fullname = CharField(max_length=255)
     phone_number = CharField(max_length=20)
+    def __repr__(self):
+        return self.fullname
 
 
 class Debt(Model):
@@ -40,8 +47,14 @@ class Debt(Model):
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.contact.fullname
+
 
 class Payment(Model):
     amount = DecimalField(max_digits=9, decimal_places=0)
     debt = ForeignKey('apps.Debt', SET_NULL, null=True, blank=True, related_name='payments')
     created_at = DateTimeField(auto_now_add=True)
+
+    def __repr__(self):
+        return self.debt.contact.fullname

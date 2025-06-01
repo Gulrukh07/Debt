@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="uz">
+{% load humanize %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -177,25 +178,25 @@
         <div class="dashboard">
             <div class="card">
                 <h3>📈 Jami Qarzlar</h3>
-                <div class="amount negative" id="totalDebt">0 so'm</div>
+                <div class="amount negative">{{ total_debts | intcomma }} so'm</div>
                 <p>Umumiy qarz miqdori</p>
             </div>
 
             <div class="card">
                 <h3>💵 To'langan</h3>
-                <div class="amount positive" id="totalPaid">0 so'm</div>
+                <div class="amount positive">{{total_paid | intcomma }} so'm</div>
                 <p>Umumiy to'lov miqdori</p>
             </div>
 
             <div class="card">
                 <h3>⏰ Qolgan Qarz</h3>
-                <div class="amount neutral" id="remainingDebt">0 so'm</div>
+                <div class="amount neutral">{{ total_left |intcomma }} so'm</div>
                 <p>To'lanishi kerak</p>
             </div>
 
             <div class="card">
                 <h3>👥 Qarzdorlar Soni</h3>
-                <div class="amount neutral" id="debtorCount">0</div>
+                <div class="amount neutral" >{{ counts | intcomma }}</div>
                 <p>Faol qarzdorlar</p>
             </div>
         </div>

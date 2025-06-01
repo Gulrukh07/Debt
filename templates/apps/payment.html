@@ -335,7 +335,7 @@
 
 
     <div class="controls">
-        <form class="search-group" action="/debt-list" method="post">
+        <form class="search-group" action="{% url 'payment-history' %}" method="post">
             <input type="hidden" name="csrfmiddlewaretoken"
                    value="joYAeKG8kssA0pDVvgIgrXtMfvyY2qPlSswOxUlpyDEOdRgZQLHCAqmHFwXJZJ5p">
 
@@ -343,18 +343,18 @@
                    placeholder="Qarzdor ismini qidiring...">
 
             <select id="month" name="month" class="add-btn">
-                <option style="color: #1b1b1b" value="01">Barcha oylar</option>
+                <option style="color: #1b1b1b" value="">Barcha oylar</option>
                 <option style="color: #1b1b1b" value="01">Yanvar</option>
                 <option style="color: #1b1b1b" value="02">Fevral</option>
                 <option style="color: #1b1b1b" value="03">Mart</option>
-                <option style="color: #1b1b1b" value="03">Aprel</option>
-                <option style="color: #1b1b1b" value="03">May</option>
-                <option style="color: #1b1b1b" value="03">Iyun</option>
-                <option style="color: #1b1b1b" value="03">Iyul</option>
-                <option style="color: #1b1b1b" value="03">Avgust</option>
-                <option style="color: #1b1b1b" value="03">Sentyabr</option>
-                <option style="color: #1b1b1b" value="03">Oktyabr</option>
-                <option style="color: #1b1b1b" value="03">Noyabr</option>
+                <option style="color: #1b1b1b" value="04">Aprel</option>
+                <option style="color: #1b1b1b" value="05">May</option>
+                <option style="color: #1b1b1b" value="06">Iyun</option>
+                <option style="color: #1b1b1b" value="07">Iyul</option>
+                <option style="color: #1b1b1b" value="08">Avgust</option>
+                <option style="color: #1b1b1b" value="09">Sentyabr</option>
+                <option style="color: #1b1b1b" value="10">Oktyabr</option>
+                <option style="color: #1b1b1b" value="11">Noyabr</option>
                 <option style="color: #1b1b1b" value="12">Dekabr</option>
             </select>
             <button class="add-btn" type="submit">Filter</button>
@@ -377,8 +377,11 @@
 
                     <div class="payment-info">
                         <div class="info-row">
-                            <span>💸 <strong>Summa</strong></span>
-                            <span>{{ payment.amount }}</span>
+                            <span>💸 <strong> Berilgan Summa</strong></span>
+                            <span>{{ payment.amount | intcomma }}</span>
+                        </div><div class="info-row">
+                            <span>💸 <strong> Qolgan Summa</strong></span>
+                            <span>{{payment.left_amount | intcomma}}</span>
                         </div>
                         <div class="info-row">
                             <span>📅<strong>Berilgan sana:</strong></span>

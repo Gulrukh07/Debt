@@ -2,10 +2,10 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from apps.views import DebtFormCreateView, ContactFormCreateView, DebtListView, DebtDeleteView, \
-    PaymentListView, PaymentDeleteView, export_payments_csv
+    PaymentListView, PaymentDeleteView, export_payments_csv, HomeDataView
 
 urlpatterns = [
-    path("", TemplateView.as_view(template_name='apps/home.html'), name='home'),
+    path("", HomeDataView.as_view(template_name='apps/home.html'), name='home'),
     path("debt-form", DebtFormCreateView.as_view(), name='debt-form'),
     path("debt-list", DebtListView.as_view(), name='debt-list'),
     path("debt-delete/<int:pk>", DebtDeleteView.as_view(), name='debt-delete'),
