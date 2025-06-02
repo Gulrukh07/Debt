@@ -32,6 +32,9 @@ class DebtFormCreateView(CreateView):
     template_name = 'apps/debt_form.html'
     success_url = reverse_lazy('debt-list')
 
+    def form_valid(self, form):
+        return super().form_valid(form)
+
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
         data['contacts'] = Contact.objects.all()
@@ -48,44 +51,67 @@ class ContactFormCreateView(CreateView):
 
 class DebtListView(ListView, FormView):
     queryset = Debt.objects.all()
-    context_object_name = 'debts'
     form_class = DebtFilterForm
-    template_name = 'apps/debt-list.html'
     success_url = reverse_lazy('debt-list')
-
-    def get_queryset(self):
-        return Debt.objects.prefetch_related('payments').annotate(
-            total_amount = Sum('payments__amount'),
-            left_amount=ExpressionWrapper(F('amount')- F('total_amount'),
-                                      output_field=DecimalField(max_digits=MAX_DIGITS,decimal_places=DECIMAL_PLACE))
-        )
+    template_name = 'apps/debt-list.html'
+    context_object_name = "debts"
 
     def form_valid(self, form):
-        search = form.cleaned_data.get('search')
-        status = form.cleaned_data.get('status')
-        category_id = form.cleaned_data.get('category')
-
+        search = form.cleaned_data.get("search")
+        status = form.cleaned_data.get("status")
+        category_id = form.cleaned_data.get("category")
         data = {}
-        query = Debt.objects.all()
+        query = Debt.objects.annotate(
+            paid_amount=Sum('payments__amount', default=0)
+        ).annotate(
+            left_amount=F("amount") - F('paid_amount'))
         if search:
             query = query.filter(Q(contact__fullname__icontains=search) | Q(contact__phone_number__icontains=search))
         if status and status != 'all':
             query = query.filter(status=status)
         if category_id and category_id != '-1':
             query = query.filter(category_id=category_id)
-
+        query = query.values(
+            'pk',
+            'amount',
+            'given_date',
+            'due_date',
+            'category__icon',
+            'category__name',
+            'status',
+            'description',
+            'contact__fullname',
+            'contact__phone_number',
+            'paid_amount',
+            'left_amount',
+        )
         data['debts'] = query
         data['status_list'] = Debt.StatusType.values
         data['categories'] = Category.objects.all()
-        data['payment'] = Payment.objects.all()
-
         return render(self.request, 'apps/debt-list.html', context=data)
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
+        query = Debt.objects.annotate(
+            paid_amount=Sum('payments__amount', default=0)
+        ).annotate(
+            left_amount=F("amount") - F('paid_amount')).values(
+            'pk',
+            'amount',
+            'given_date',
+            'due_date',
+            'category__icon',
+            'category__name',
+            'status',
+            'description',
+            'contact__fullname',
+            'contact__phone_number',
+            'paid_amount',
+            'left_amount',
+        )
+        data['debts'] = query
         data['status_list'] = Debt.StatusType.values
         data['categories'] = Category.objects.all()
-
         return data
 
 

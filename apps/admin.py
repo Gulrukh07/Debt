@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from apps.models import Payment, Debt, Category, Contact
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.contrib import admin
 
 @admin.register(Payment)
@@ -26,4 +26,4 @@ class ContactAdmin(admin.ModelAdmin):
     list_filter = 'id', 'fullname'
 
 admin.site.unregister(Group)
-admin.site.unregister(User)
+# admin.site.unregister(User)

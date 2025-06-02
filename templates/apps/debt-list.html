@@ -329,7 +329,7 @@
         {% for debt in debts %}
             <div class="debt-card">
                 <div class="debt-header">
-                    <div class="debtor-name">{{ debt.contact.fullname }}</div>
+                    <div class="debtor-name">{{ debt.contact__fullname }}</div>
                     <div class="debt-amount">{{ debt.amount |intcomma }}</div>
                 </div>
 
@@ -344,7 +344,7 @@
                     </div>
                     <div class="info-row">
                         <span>💰 To'langan:</span>
-                        <span class="text-success">{{ debt.total_amount | intcomma}}</span>
+                        <span class="text-success">{{ debt.paid_amount | intcomma}}</span>
                     </div>
                     <div class="info-row">
                         <span>💸 Qolgan:</span>
@@ -352,11 +352,11 @@
                     </div>
                     <div class="info-row">
                         <span><img src="{{ debt.category.icon }}" alt=""> Turi: </span>
-                        <span>{{ debt.category.name }}</span>
+                        <span>{{ debt.category__name }}</span>
                     </div>
                     <div class="info-row">
                         <span>📞 Telefon:</span>
-                        <span><a href="tel:{{ debt.contact.phone_number }}">{{ debt.contact.phone_number }}</a></span>
+                        <span><a href="tel:{{ debt.contact.phone_number }}">{{ debt.contact__phone_number }}</a></span>
                     </div>
                 </div>
 

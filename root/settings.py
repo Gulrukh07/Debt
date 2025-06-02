@@ -13,8 +13,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-MAX_DIGITS=15
-DECIMAL_PLACE=2
+MAX_DIGITS = 15
+DECIMAL_PLACE = 2
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "apps",
     "import_export",
+    'authentication'
 ]
 
 MIDDLEWARE = [
@@ -40,6 +41,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'root.urls'
+AUTH_USER_MODEL = 'authentication.User'
 
 TEMPLATES = [
     {
