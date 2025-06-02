@@ -368,7 +368,7 @@
                 <p style="margin-top: 10px; font-style: italic; color: #666;">💬 {{ debt.description }}</p>
 
                 <div class="debt-actions">
-                    <a href="{% url 'payment-history' %}">
+                    <a href="{% url 'payment-form' debt.pk %}">
                         <button class="btn btn-success">
                             💳 To'lov
                         </button>

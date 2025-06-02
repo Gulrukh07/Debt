@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import CreateView, ListView, FormView, DeleteView
 
-from apps.forms import DebtModelForm, ContactModelForm, DebtFilterForm, PaymentFilterForm
+from apps.forms import DebtModelForm, ContactModelForm, DebtFilterForm, PaymentFilterForm, PaymentModelForm
 from apps.models import Debt, Contact, Category, Payment
 from root.settings import MAX_DIGITS, DECIMAL_PLACE
 
@@ -168,3 +168,26 @@ def export_payments_csv(request):
         ])
 
     return response
+
+
+class PaymentFormView(CreateView):
+    queryset = Payment.objects.all()
+    form_class = PaymentModelForm
+    template_name = 'apps/payment-form.html'
+    success_url = reverse_lazy('debt-list')
+    context_object_name = 'debt'
+
+    def get_context_data(self, **kwargs):
+        debt_id = self.kwargs.get("pk")
+        context = super().get_context_data(**kwargs)
+        context['debt'] = Debt.objects.filter(pk=debt_id).annotate(
+            left_amount=F("amount") - Sum("payments__amount", default=0)).values("pk", 'left_amount').first()
+        return context
+
+    def form_valid(self, form):
+        debt_id = form.data.get("debt")
+        debt = Debt.objects.filter(pk=debt_id).first()
+        if debt.left_amount == 0:
+            debt.status = Debt.StatusType.PAID.value
+            debt.save()
+        return super().form_valid(form)

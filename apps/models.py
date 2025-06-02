@@ -55,6 +55,8 @@ class Payment(Model):
     amount = DecimalField(max_digits=9, decimal_places=0)
     debt = ForeignKey('apps.Debt', SET_NULL, null=True, blank=True, related_name='payments')
     created_at = DateTimeField(auto_now_add=True)
+    paid_date = DateField()
+    notes = TextField()
 
     def __repr__(self):
         return self.debt.contact.fullname

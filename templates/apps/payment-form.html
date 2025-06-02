@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+        color: white;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .controls {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .search-group {
+        display: flex;
+        gap: 10px;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+    }
+
+    .filter-select {
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        min-width: 120px;
+    }
+
+    .add-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+    }
+
+    .add-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .debt-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+
+    .debt-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .debt-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .debt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .debtor-name {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .debt-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #e74c3c;
+    }
+
+    .debt-info {
+        margin-bottom: 15px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .status-active {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-paid {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-overdue {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .debt-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-success {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+        opacity: 0.9;
+    }
+
+    .empty-state {
+        text-align: center;
+        background: white;
+        padding: 60px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .modal {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 400px;
+        width: 90%;
+    }
+
+    .modal-header {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .form-group input, .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .form-group small {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+    }
+
+    @media (max-width: 768px) {
+        .controls {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-group {
+            width: 100%;
+            min-width: auto;
+        }
+
+        .debt-grid {
+            grid-template-columns: 1fr;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="modal">
+        <form class="modal-content" action="{% url 'payment-form' debt.pk %}" method="post">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h3>💳 To'lov Qilish</h3>
+                <p id="paymentDebtorName"></p>
+            </div>
+            <div class="form-group">
+                <label>To'lov miqdori (so'm):</label>
+                <input type="number" name="amount" id="paymentAmount" min="1" placeholder="0">
+                <small>Qolgan qarz: <span id="remainingAmount">{{ debt.left_amount }}</span></small>
+            </div>
+            <div class="form-group">
+                <label>To'lov sanasi:</label>
+                <input name="paid_date" type="date" id="paymentDate">
+            </div>
+            <div class="form-group">
+                <label>Izoh:</label>
+                <textarea id="paymentNote" name="notes" placeholder="To'lov haqida izoh..."></textarea>
+            </div>
+            <input type="hidden" value="{{ debt.pk }}" name="debt">
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="processPayment()">To'lash</button>
+                <a href="{% url 'debt-list' %}" class="btn btn-danger" onclick="closeModal()">Bekor qilish</a>
+            </div>
+        </form>
+
+    </div>
+</div>
+</body>
+</html>
