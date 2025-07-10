@@ -1,21 +1,30 @@
 import csv
+from itertools import chain
+from operator import attrgetter
 
-from django.db.models import Q, Sum, ExpressionWrapper, F, DecimalField, Count
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q, Sum, ExpressionWrapper, F, DecimalField, Count, Value
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, ListView, FormView, DeleteView, TemplateView
+from django.views.generic import CreateView, ListView, FormView, DeleteView, TemplateView, DetailView
 
 from apps.forms import DebtModelForm, ContactModelForm, DebtFilterForm, PaymentFilterForm, PaymentModelForm
 from apps.models import Debt, Contact, Category, Payment
 from root.settings import MAX_DIGITS, DECIMAL_PLACE
 
 
-class HomeDataView(ListView):
+class HomeDataView(LoginRequiredMixin,ListView):
+    login_url = reverse_lazy('register')
     queryset = Debt.objects.all()
     context_object_name = 'home'
     template_name = 'apps/home.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        return queryset
 
     def get_context_data(self, *args, **kwargs):
         data = super().get_context_data(*args, **kwargs)
@@ -23,8 +32,22 @@ class HomeDataView(ListView):
         data['total_paid'] = Payment.objects.aggregate(total=Sum('amount'))['total'] or 0
         data['counts'] = Debt.objects.aggregate(count=Count('id'))['count'] or 0
         data['total_left'] = data['total_debts'] - data['total_paid']
-        return data
+        debts = Debt.objects.select_related('contact').all()
+        payments = Payment.objects.select_related('debt__contact').all()
 
+        for d in debts:
+            d.item_type = 'debt'
+        for p in payments:
+            p.item_type = 'payment'
+
+        combined = sorted(
+            chain(debts, payments),
+            key=attrgetter('created_at'),
+            reverse=True
+        )
+
+        data['activities'] = combined
+        return data
 
 class DebtFormCreateView(CreateView):
     queryset = Debt.objects.all()
@@ -34,6 +57,8 @@ class DebtFormCreateView(CreateView):
 
     def form_valid(self, form):
         return super().form_valid(form)
+    def form_invalid(self, form):
+        pass
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -42,12 +67,24 @@ class DebtFormCreateView(CreateView):
         return data
 
 
+class DebtPaymentListView(LoginRequiredMixin, ListView):
+    template_name = 'debt-detail.html'
+    context_object_name = 'payments'
+
+    def get_queryset(self):
+        return Payment.objects.filter(debt_id=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        debt_id = self.kwargs.get("pk")
+        debt = Debt.objects.select_related('contact', 'category').get(pk=debt_id)
+        context['debt'] = debt
+        return context
 class ContactFormCreateView(CreateView):
     queryset = Debt.objects.all()
     form_class = ContactModelForm
     template_name = 'apps/contact-form.html'
     success_url = reverse_lazy('debt-list')
-
 
 class DebtListView(ListView, FormView):
     queryset = Debt.objects.all()
@@ -60,67 +97,47 @@ class DebtListView(ListView, FormView):
         search = form.cleaned_data.get("search")
         status = form.cleaned_data.get("status")
         category_id = form.cleaned_data.get("category")
-        data = {}
+
+        # Faqat paid_amount hisoblanadi
         query = Debt.objects.annotate(
-            paid_amount=Sum('payments__amount', default=0)
-        ).annotate(
-            left_amount=F("amount") - F('paid_amount'))
+            paid_amount=Coalesce(Sum('payments__amount'), Value(0), output_field=DecimalField())
+        )
+
         if search:
-            query = query.filter(Q(contact__fullname__icontains=search) | Q(contact__phone_number__icontains=search))
+            query = query.filter(
+                Q(contact__fullname__icontains=search) |
+                Q(contact__phone_number__icontains=search)
+            )
         if status and status != 'all':
             query = query.filter(status=status)
         if category_id and category_id != '-1':
             query = query.filter(category_id=category_id)
-        query = query.values(
-            'pk',
-            'amount',
-            'given_date',
-            'due_date',
-            'category__icon',
-            'category__name',
-            'status',
-            'description',
-            'contact__fullname',
-            'contact__phone_number',
-            'paid_amount',
-            'left_amount',
-        )
-        data['debts'] = query
-        data['status_list'] = Debt.StatusType.values
-        data['categories'] = Category.objects.all()
-        return render(self.request, 'apps/debt-list.html', context=data)
 
-    def get_context_data(self, *args, **kwargs):
-        data = super().get_context_data(*args, **kwargs)
+        data = {
+            'debts': query,
+            'status_list': Debt.StatusType.values,
+            'categories': Category.objects.all(),
+            'form': form,
+        }
+        return render(self.request, self.template_name, context=data)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+
         query = Debt.objects.annotate(
-            paid_amount=Sum('payments__amount', default=0)
-        ).annotate(
-            left_amount=F("amount") - F('paid_amount')).values(
-            'pk',
-            'amount',
-            'given_date',
-            'due_date',
-            'category__icon',
-            'category__name',
-            'status',
-            'description',
-            'contact__fullname',
-            'contact__phone_number',
-            'paid_amount',
-            'left_amount',
+            paid_amount=Coalesce(Sum('payments__amount'), Value(0), output_field=DecimalField())
         )
+
         data['debts'] = query
         data['status_list'] = Debt.StatusType.values
         data['categories'] = Category.objects.all()
         return data
-
 
 class DebtDeleteView(DeleteView):
     queryset = Debt.objects.all()
     template_name = 'apps/debt-list.html'
     success_url = reverse_lazy('debt-list')
     pk_url_kwarg = 'pk'
-
 
 class PaymentListView(ListView):
     queryset = Payment.objects.all()
@@ -166,13 +183,11 @@ class PaymentListView(ListView):
 
         return render(request, template_name='apps/payment.html', context=context)
 
-
 class PaymentDeleteView(DeleteView):
     queryset = Payment.objects.all()
     template_name = 'apps/payment.html'
     success_url = reverse_lazy('payment-history')
     pk_url_kwarg = 'pk'
-
 
 def export_payments_csv(request):
     response = HttpResponse(content_type='text/csv')
@@ -195,26 +210,31 @@ def export_payments_csv(request):
 
     return response
 
-
 class PaymentFormView(CreateView):
     queryset = Payment.objects.all()
     form_class = PaymentModelForm
     template_name = 'apps/payment-form.html'
     success_url = reverse_lazy('debt-list')
-    context_object_name = 'debt'
+
+    def get_initial(self):
+        initial = super().get_initial()
+        debt_id = self.kwargs.get('pk')
+        initial['debt'] = debt_id
+        return initial
 
     def get_context_data(self, **kwargs):
-        debt_id = self.kwargs.get("pk")
         context = super().get_context_data(**kwargs)
-        context['debt'] = Debt.objects.filter(pk=debt_id).annotate(
-            left_amount=F("amount") - Sum("payments__amount", default=0)).values("pk", 'left_amount').first()
+        debt_id = self.kwargs.get("pk")
+        context['debt'] = get_object_or_404(Debt, pk=debt_id)
         return context
 
     def form_valid(self, form):
-        debt_id = form.data.get("debt")
-        debt = Debt.objects.filter(pk=debt_id).first()
+        response = super().form_valid(form)
+        payment = self.object
+        debt = payment.debt
         if debt.left_amount == 0:
             debt.status = Debt.StatusType.PAID.value
             debt.save()
-        return super().form_valid(form)
+        return response
+
 

@@ -1,8 +1,9 @@
 from django.db.models import Model, CharField, SlugField, DecimalField, DateField, TextField, ForeignKey, CASCADE, \
-    DateTimeField, SET_NULL
+    DateTimeField, SET_NULL, Value
 from django.db.models.aggregates import Sum
 from django.db.models.enums import TextChoices
 from django.db.models.fields import URLField
+from django.db.models.functions import Coalesce
 from django.utils.text import slugify
 
 
@@ -46,13 +47,21 @@ class Debt(Model):
     user = ForeignKey('authentication.User', CASCADE, related_name='debts')
     contact = ForeignKey('apps.Contact', CASCADE, related_name='debts')
     status = CharField(max_length=25, choices=StatusType.choices, default=StatusType.ACTIVE)
+    left_amount = DecimalField(max_digits=15, decimal_places=0)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
 
-    @property
-    def left_amount(self):
-        data = self.payments.annotate(paid_amount=Sum('amount', default=0)).values("paid_amount").first()
-        return self.amount - data.get('paid_amount') if data else 0
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.left_amount = self.amount
+        super().save(*args, **kwargs)
+
+    def update_left_amount(self):
+        total_paid = self.payments.aggregate(
+            total=Coalesce(Sum('amount'), Value(0), output_field=DecimalField())
+        )['total']
+        self.left_amount = self.amount - total_paid
+        self.save()
 
     def __str__(self):
         return self.contact.fullname
@@ -64,6 +73,13 @@ class Payment(Model):
     created_at = DateTimeField(auto_now_add=True)
     paid_date = DateField()
     notes = TextField()
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.debt.update_left_amount()
 
     def __repr__(self):
         return self.debt.contact.fullname

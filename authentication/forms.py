@@ -5,7 +5,6 @@ from django.forms.models import ModelForm
 
 from authentication.models import User
 
-
 class RegisterModelForm(ModelForm):
     confirm_password =  CharField(max_length=255 , required=True)
     class Meta:

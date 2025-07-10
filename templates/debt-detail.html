@@ -292,147 +292,55 @@
 </head>
 <body>
 <div class="container">
-    <a href="{% url 'home' %}" class="back-btn">← Bosh sahifaga qaytish</a>
+    <a href="{% url 'debt-list' %}" class="back-btn">← Qarzlar ro'yxati</a>
 
     <header>
-        <h1>📋 Qarzlar Ro'yxati</h1>
+        <h1>📋 Qarz bo'yicha to'lovlar tarixi</h1>
     </header>
+    {% if payments %}
+        <div class="debt-grid">
+            {% for payment in payments %}
+                <div class="debt-card">
+                    <div class="debt-header">
+                        <div class="debtor-name">{{ payment.debt.contact.fullname }}</div>
+                        <div class="debt-amount">{{ payment.debt.amount |intcomma }} so'm </div>
+                    </div>
 
-    <div class="controls">
-        <form class="search-group" action="{% url 'debt-list' %}" method="post">
-            {% csrf_token %}
-            <div class="search-group">
-                <input type="text" class="search-input" id="searchInput" name="search"
-                       placeholder="Qarzdor ismini qidiring...">
-                <select class="filter-select" id="statusFilter" name="status">
-                    <option value="all">Barcha holat</option>
-                    {% for status in status_list %}
-                        <option value="{{ status }}">{{ status }}</option>
-                    {% endfor %}
+                    <div class="debt-info">
+                        <div class="info-row">
+                            <span>💰 To'langan:</span>
+                            <span>{{ payment.amount |intcomma }} so'm</span>
+                        </div>
+                        <div class="info-row">
+                            <span>💸 Qolgan:</span>
+                            <span class="text-danger">{{debt.left_amount |intcomma}} so'm</span>
+                        </div>
+                        <div class="info-row">
+                            <span>⏰ To'langan sanasi:</span>
+                            <span>{{ payment.paid_date }}</span>
+                        </div>
 
-                </select>
-                <select class="filter-select" id="categoryFilter" name="category">
-                    <option value="-1">Barcha turlar</option>
-                    {% for category in categories %}
-                        <option value="{{ category.pk }}">{{ category.name }}</option>
+                        <div class="info-row">
+                            <span>📞 Telefon:</span>
+                            <span><a href="tel:{{ payment.debt.contact.phone_number }}">{{ payment.debt.contact.phone_number }}</a></span>
+                        </div>
+                    </div>
 
-                    {% endfor %}
+                    <p style="margin-top: 10px; font-style: italic; color: #666;">💬 {{ payment.notes }}</p>
 
-                </select>
-            </div>
-            <button class='add-btn' type="submit">Filter</button>
-            <a href="{% url 'debt-form' %}" class="add-btn">+ Yangi Qarz</a>
-        </form>
-    </div>
-
-    <div class="debt-grid">
-        {% for debt in debts %}
-            <div class="debt-card">
-                <div class="debt-header">
-                    <div class="debtor-name">{{ debt.contact.fullname }}</div>
-                    <div class="debt-amount">{{ debt.amount |intcomma }}</div>
                 </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state" style="display: none;">
+            <div class="empty-icon">📝</div>
+            <h3>Hozircha to'lovlar yo'q</h3>
+        </div>
 
-                <div class="debt-info">
-                    <div class="info-row">
-                        <span>📅 Berilgan sana:</span>
-                        <span>{{ debt.given_date }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>⏰ Qaytarish sanasi:</span>
-                        <span>{{ debt.due_date }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>💰 To'langan:</span>
-                        <span class="text-success">{{ debt.paid_amount | intcomma}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>💸 Qolgan:</span>
-                        <span class="text-danger">{{ debt.left_amount |intcomma}}</span>
-                    </div>
-                    <div class="info-row">
-                        <span><img src="{{ debt.category.icon }}" alt=""> Turi: </span>
-                        <span>{{ debt.category.name }}</span>
-                    </div>
-                    <div class="info-row">
-                        <span>📞 Telefon:</span>
-                        <span><a href="tel:{{ debt.contact.phone_number }}">{{ debt.contact.phone_number }}</a></span>
-                    </div>
-                </div>
+    {% endif %}
 
-                <div class="info-row">
-                    <span>Status</span>
-                    <span>{{ debt.status }}</span>
-                </div>
-
-                <p style="margin-top: 10px; font-style: italic; color: #666;">💬 {{ debt.description }}</p>
-
-                <div class="debt-actions">
-                    <a href="{% url 'payment-form' debt.pk %}">
-                        <button class="btn btn-success">
-                            💳 To'lov
-                        </button>
-                    </a>
-                    <a href="{% url 'debt-detail' debt.pk %}" class="btn btn-primary">
-                        👁️ Batafsil
-                    </a>
-                        <form action="{% url 'debt-delete' debt.pk%}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">🗑️</button>
-
-                        </form>
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-
-    <div class="empty-state" style="display: none;">
-        <div class="empty-icon">📝</div>
-        <h3>Hozircha qarzlar yo'q</h3>
-        <p>Yangi qarz qo'shish uchun yuqoridagi tugmani bosing</p>
-    </div>
 </div>
 
-<!-- To'lov modali -->
-<div class="modal" id="paymentModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>💳 To'lov Qilish</h3>
-            <p id="paymentDebtorName"></p>
-        </div>
-        <div class="form-group">
-            <label>To'lov miqdori (so'm):</label>
-            <input type="number" id="paymentAmount" min="1" placeholder="0">
-            <small>Qolgan qarz: <span id="remainingAmount"></span></small>
-        </div>
-        <div class="form-group">
-            <label>To'lov sanasi:</label>
-            <input type="date" id="paymentDate">
-        </div>
-        <div class="form-group">
-            <label>Izoh:</label>
-            <textarea id="paymentNote" placeholder="To'lov haqida izoh..."></textarea>
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-success" onclick="processPayment()">To'lash</button>
-            <button class="btn" onclick="closeModal()">Bekor qilish</button>
-        </div>
-    </div>
-</div>
-
-<!-- O'chirish tasdiqi modali -->
-<div class="modal" id="deleteModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>🗑️ Qarzni O'chirish</h3>
-            <p>Haqiqatan ham bu qarzni o'chirmoqchimisiz?</p>
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-danger" onclick="confirmDelete()">O'chirish</button>
-            <button class="btn" onclick="closeModal()">Bekor qilish</button>
-        </div>
-    </div>
-</div>
 
 <script>
     let debts = JSON.parse(localStorage.getItem('debts')) || [];
@@ -445,7 +353,7 @@
     {#    setupEventListeners();#}
     {#    document.getElementById('paymentDate').valueAsDate = new Date();#}
 
-    
+
 
     function setupEventListeners() {
         document.getElementById('searchInput').addEventListener('input', filterDebts);

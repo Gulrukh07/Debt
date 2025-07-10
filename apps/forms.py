@@ -39,14 +39,18 @@ class PaymentModelForm(ModelForm):
         model = Payment
         fields = 'amount', 'debt', 'paid_date', 'notes'
 
-        def clean_amount(self):
-            payment_amount = self.cleaned_data.get("amount")
-            debt_id = self.data.get("debt")
-            amount_list = Debt.objects.filter(pk=debt_id).annotate(paid=Sum('payments__amount',default=0)).values('paid' , 'amount').first()
-            left_amount = amount_list.get('amount') - amount_list.get('paid')
-            if left_amount < payment_amount:
-                raise ValidationError("Ortiqcha summa to'lanmoqda !")
+    def clean_amount(self):
+        amount = self.cleaned_data['amount']
+        debt = self.cleaned_data.get('debt')
 
-            if payment_amount < 0:
-                raise ValidationError("To'lov summasi manfiy bo'lmasin!")
-            return payment_amount
+        if not isinstance(debt, Debt):
+            debt_id = debt or self.initial.get('debt')
+            debt = Debt.objects.get(pk=debt_id)
+
+        if amount > debt.left_amount:
+            raise ValidationError("To'lov miqdori qolgan qarzdan ko'p bo'lishi mumkin emas.")
+
+        if amount < 0:
+            raise ValidationError("To'lov summasi manfiy bo'lmasin!")
+
+        return amount

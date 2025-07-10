@@ -172,6 +172,7 @@
             <a href="{% url 'contact-form' %}"><button class="nav-btn">➕ Contact</button></a>
             <a href="{% url 'debt-list' %}"><button class="nav-btn" onclick="showDebtList()">📋 Qarzlar Ro'yxati</button></a>
             <a href="{% url 'payment-history' %}"><button class="nav-btn" onclick="showPayments()">💳 To'lovlar</button></a>
+            <a href="{% url 'register' %}"><button class="nav-btn" onclick="showPayments()">👤 Profile</button></a>
         </div>
 
         <div class="dashboard">
@@ -205,8 +206,21 @@
             <div id="recentTransactions">
                 <div class="transaction-item">
                     <div class="transaction-info">
-                        <h4>Hozircha tranzaksiya yo'q</h4>
-                        <p class="transaction-date">Qarz yoki to'lov qo'shing</p>
+                        {% for obj in activities %}
+                            {% if obj.item_type == 'debt' %}
+                                <li>
+                                    📝 Yangi qarz: <strong>{{ obj.contact.fullname }}</strong> —
+                                    {{ obj.amount|intcomma }} so'm ({{ obj.created_at|date:"d.m.Y H:i" }})
+                                </li>
+                            {% elif obj.item_type == 'payment' %}
+                                <li>
+                                    💳 To‘lov: <strong>{{ obj.debt.contact.fullname }}</strong> —
+                                    {{ obj.amount|intcomma }} so'm ({{ obj.created_at|date:"d.m.Y H:i" }})
+                                </li>
+                            {% endif %}
+                        {% empty %}
+                            <li>Faollik yo‘q</li>
+                        {% endfor %}
                     </div>
                     <div class="transaction-amount neutral">-</div>
                 </div>

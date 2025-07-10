@@ -11,7 +11,7 @@ SECRET_KEY = 'django-insecure-$j(uyu^75!l$x8mtu@z1_-ms$6%&(b)92ib3#jq8l=ku-bk18g
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 MAX_DIGITS = 15
 DECIMAL_PLACE = 2
