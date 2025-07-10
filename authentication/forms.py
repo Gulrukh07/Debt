@@ -1,5 +1,3 @@
-
-from django.contrib.auth import login
 from django.contrib.auth.hashers import make_password, check_password
 from django.core.exceptions import ValidationError
 from django.forms.fields import CharField
