@@ -278,9 +278,7 @@
                 <input type="password" name="password" id="loginPassword" required>
             </div>
             <button type="submit" class="btn btn-primary">Kirish</button>
-            <div class="forgot-link">
-                <a href="#" onclick="showForgotPassword()">Parolni unutdingizmi?</a>
-            </div>
+
         </form>
 
         <!-- Register Form -->
@@ -305,38 +303,7 @@
             <button type="submit" class="btn btn-primary">Ro'yxatdan o'tish</button>
         </form>
 
-        <!-- Forgot Password Section -->
-        <div class="verification-section" id="forgotSection">
-            <h3>Parolni tiklash</h3>
-            <p>Email manzilingizni kiriting</p>
-            <div class="input-group">
-                <input type="email" id="forgotEmail" placeholder="Email manzilingiz" required>
-            </div>
-            <button class="btn btn-primary" onclick="sendResetCode()">Kod yuborish</button>
-            <button class="btn btn-secondary" onclick="backToLogin()">Orqaga</button>
-        </div>
-
-        <!-- Email Verification Section -->
-        <div class="verification-section" id="verificationSection">
-            <h3>Email tasdiqlash</h3>
-            <p>Emailingizga yuborilgan 6 raqamli kodni kiriting</p>
-            <div class="code-input">
-                <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 0)">
-                <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 1)">
-                <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 2)">
-                <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 3)">
-                <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 4)">
-                <input type="text" class="code-digit" maxlength="1" oninput="moveToNext(this, 5)">
-            </div>
-            <button class="btn btn-primary" onclick="verifyCode()">Tasdiqlash</button>
-            <div class="resend-timer">
-                <span id="resendTimer">Qaytadan yuborish: 60s</span>
-                <button class="btn btn-secondary" id="resendBtn" onclick="resendCode()" style="display: none;">Qaytadan yuborish</button>
-            </div>
-            <button class="btn btn-secondary" onclick="backToLogin()">Orqaga</button>
-        </div>
-    </div>
-</div>
+       </div>
 
 <script>
     let resendTimer = 60;

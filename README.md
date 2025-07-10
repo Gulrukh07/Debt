@@ -1,73 +1,79 @@
+💰 Debt Management App
 
-## 🇺🇿 O‘zbekcha
+A simple and efficient Django-based web application for tracking personal debts and payments.
 
-# 💸 Debt – Qarzdorlikni boshqarish tizimi
+ 📌 Features
 
-**Debt** — bu foydalanuvchilarga qarzlarni qo‘shish, qarzdorlarni ro‘yxatga olish, to‘lovlarni qayd qilish va qarzlar tarixini boshqarish imkonini beruvchi RESTful API. Ushbu loyiha Django va Django REST Framework asosida yaratilgan bo‘lib, o‘rganish va amaliyot maqsadida ishlab chiqilgan.
+- ✅ Add, update, and delete **debts**
+- ✅ Record **payments** and link them to specific debts
+- ✅ View a combined activity feed of debts and payments
+- ✅ Organize entries by **contacts** and **categories**
+- ✅ Secure user **authentication** and session management
+- ✅ Clean and responsive user interface using Django templates
+- ✅ Uses Django Class-Based Views (CBVs) for clean architecture
 
----
+ 🛠️ Technologies Used
 
-### ⚙️ Loyihaning imkoniyatlari
+- Python 3
+- Django 4+
+- SQLite (default) – easy to replace with PostgreSQL
+- HTML/CSS (Django templates)
+- Bootstrap (for UI styling)
+- Python's `itertools` and `operator` modules for efficient sorting and merging
 
-* 🔐 Foydalanuvchi ro‘yxatdan o‘tishi va login (token orqali)
-* ➕ Qarzdorlar va qarzlar ro‘yxatini yuritish
-* 💰 To‘lovlarni qo‘shish va qarzni kamaytirish
-* 📄 Qarzdorlar bo‘yicha umumiy statistikani ko‘rish
-* 🛠️ Admin panel orqali boshqaruv
+ 🚀 Setup Instructions
 
----
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Gulrukh07/Debt.git
+   cd Debt
+````
 
-### 🧱 Texnologiyalar
+2. **Create and activate a virtual environment**:
 
-* Python 3.x
-* Django 4.x
-* Django REST Framework
-* SQLite (PostgreSQL bilan almashtirish mumkin)
-* Token Authentication
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Windows: venv\Scripts\activate
+   ```
 
----
+3. **Install dependencies**:
 
-### 🚀 O‘rnatish
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-git clone https://github.com/Gulrukh07/Debt.git
-cd Debt
-```
+4. **Run migrations**:
 
----
+   ```bash
+   python manage.py migrate
+   ```
 
-## 🇬🇧 English
+5. **Create a superuser**:
 
-# 💸 Debt – Debt Management API
+   ```bash
+   python manage.py createsuperuser
+   ```
 
-**Debt** is a RESTful API that allows users to record debts, manage debtors, track payments, and view historical statistics. The project is built with Django and Django REST Framework and was developed for learning and practical purposes.
+6. **Run the development server**:
 
----
+   ```bash
+   python manage.py runserver
+   ```
 
-### ⚙️ Features
+ 📂 App Structure
 
-* 🔐 User registration and login (with token authentication)
-* ➕ Add and manage debtor and debt records
-* 💰 Record payments to reduce debt
-* 📄 View statistics and debt history
-* 🛠️ Admin panel for full management
+* `debt/` – Main app containing models, views, and forms
+* `templates/` – All HTML templates used for rendering pages
+* `static/` – Static files (CSS, JS, etc.)
+* `users/` – Custom user-related logic and authentication
 
----
+ 🧠 How It Works
 
-### 🧱 Tech Stack
+* Debts and Payments are two separate models but are combined in the view using `itertools.chain` and sorted by `created_at`.
+* Each user can manage their own debt records and filter by contact or category.
+* Simple and intuitive layout makes it easy to track financial activities.
 
-* Python 3.x
-* Django 4.x
-* Django REST Framework
-* SQLite (can be replaced with PostgreSQL)
-* Token Authentication
+ 🙋‍♀️ Author
 
----
-
-### 🚀 Installation
-
-```bash
-git clone https://github.com/Gulrukh07/Debt.git
-cd Debt
-```
+Built with 💙 by [Gulrukh Khayrullaeva](https://github.com/Gulrukh07)
 
