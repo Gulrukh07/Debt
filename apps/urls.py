@@ -13,5 +13,5 @@ urlpatterns = [
     path("payment-history", PaymentListView.as_view(), name='payment-history'),
     path("payment-form<int:pk>", PaymentFormView.as_view(), name='payment-form'),
     path("payment-delete/<int:pk>", PaymentDeleteView.as_view(), name='payment-delete'),
-    path("payment-dexport", export_payments_csv, name='payment-export')
+    path("payment-dexport", export_payments_csv, name='payment-export'),
 ]

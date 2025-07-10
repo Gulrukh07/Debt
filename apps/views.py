@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.views.generic import CreateView, ListView, FormView, DeleteView
+from django.views.generic import CreateView, ListView, FormView, DeleteView, TemplateView
 
 from apps.forms import DebtModelForm, ContactModelForm, DebtFilterForm, PaymentFilterForm, PaymentModelForm
 from apps.models import Debt, Contact, Category, Payment
@@ -217,3 +217,4 @@ class PaymentFormView(CreateView):
             debt.status = Debt.StatusType.PAID.value
             debt.save()
         return super().form_valid(form)
+
