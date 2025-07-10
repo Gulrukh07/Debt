@@ -1,8 +1,9 @@
-💰 Debt Management App
+
+# 💰 Debt Management App
 
 A simple and efficient Django-based web application for tracking personal debts and payments.
 
- 📌 Features
+## 📌 Features
 
 - ✅ Add, update, and delete **debts**
 - ✅ Record **payments** and link them to specific debts
@@ -12,7 +13,7 @@ A simple and efficient Django-based web application for tracking personal debts 
 - ✅ Clean and responsive user interface using Django templates
 - ✅ Uses Django Class-Based Views (CBVs) for clean architecture
 
- 🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 - Python 3
 - Django 4+
@@ -21,13 +22,13 @@ A simple and efficient Django-based web application for tracking personal debts 
 - Bootstrap (for UI styling)
 - Python's `itertools` and `operator` modules for efficient sorting and merging
 
- 🚀 Setup Instructions
+## 🚀 Setup Instructions
 
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/Gulrukh07/Debt.git
    cd Debt
-````
+
 
 2. **Create and activate a virtual environment**:
 
@@ -60,20 +61,22 @@ A simple and efficient Django-based web application for tracking personal debts 
    python manage.py runserver
    ```
 
- 📂 App Structure
+
+## 📂 App Structure
 
 * `debt/` – Main app containing models, views, and forms
 * `templates/` – All HTML templates used for rendering pages
 * `static/` – Static files (CSS, JS, etc.)
 * `users/` – Custom user-related logic and authentication
 
- 🧠 How It Works
+## 🧠 How It Works
 
 * Debts and Payments are two separate models but are combined in the view using `itertools.chain` and sorted by `created_at`.
 * Each user can manage their own debt records and filter by contact or category.
 * Simple and intuitive layout makes it easy to track financial activities.
 
- 🙋‍♀️ Author
+
+## 🙋‍♀️ Author
 
 Built with 💙 by [Gulrukh Khayrullaeva](https://github.com/Gulrukh07)
 
