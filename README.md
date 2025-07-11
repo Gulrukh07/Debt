@@ -17,7 +17,7 @@ A simple and efficient Django-based web application for tracking personal debts 
 
 - Python 3
 - Django 4+
-- SQLite (default) – easy to replace with PostgreSQL
+- PostgreSQL
 - HTML/CSS (Django templates)
 - Bootstrap (for UI styling)
 - Python's `itertools` and `operator` modules for efficient sorting and merging
