@@ -172,7 +172,15 @@
             <a href="{% url 'contact-form' %}"><button class="nav-btn">➕ Contact</button></a>
             <a href="{% url 'debt-list' %}"><button class="nav-btn" onclick="showDebtList()">📋 Qarzlar Ro'yxati</button></a>
             <a href="{% url 'payment-history' %}"><button class="nav-btn" onclick="showPayments()">💳 To'lovlar</button></a>
-            <a href="{% url 'register' %}"><button class="nav-btn" onclick="showPayments()">👤 Profile</button></a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'logout' %}">
+                    <button type="submit" class="nav-btn">🔓 Logout</button>
+                </a>
+            {% else %}
+                <a href="{% url 'register' %}">
+                    <button class="nav-btn" onclick="showPayments()">👤 Profile</button>
+                </a>
+            {% endif %}
         </div>
 
         <div class="dashboard">
