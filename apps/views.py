@@ -58,7 +58,7 @@ class DebtFormCreateView(CreateView):
     def form_valid(self, form):
         return super().form_valid(form)
     def form_invalid(self, form):
-        pass
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)

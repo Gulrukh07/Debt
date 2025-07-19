@@ -1,0 +1,47 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v3
+#
+#      - name: Set up Python
+#        uses: actions/setup-python@v4
+#        with:
+#          python-version: '3.10'
+#
+#      - name: Install dependencies
+#        run: pip install -r requirements.txt
+#
+#      - name: Run tests
+#        run: pytest
+
+      - name: Deploy to Production via SSH
+        if: github.ref == 'refs/heads/master'
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd /var/www/debt
+            git fetch origin
+            git reset --hard origin/master
+            git pull origin
+            source .venv/bin/activate
+            pip install -r requirements.txt
+            make mig
+            sudo systemctl restart debt_project.service
+            sudo systemctl enable debt_project.service
+            sudo systemctl restart nginx.service
+            sudo systemctl enable nginx.service

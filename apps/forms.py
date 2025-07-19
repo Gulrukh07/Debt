@@ -12,6 +12,9 @@ from apps.models import Debt, Contact, Payment
 
 
 class DebtModelForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ModelForm, self).__init__(*args, **kwargs)
+        self.fields['description'].required = False
     class Meta:
         model = Debt
         fields = 'amount', 'given_date', 'due_date', 'description', 'category', 'user', 'contact'
@@ -35,6 +38,9 @@ class PaymentFilterForm(Form):
     month = DateField(widget=DateInput(attrs={'type':month}), required=False)
 
 class PaymentModelForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ModelForm, self).__init__(*args, **kwargs)
+        self.fields['notes'].required = False
     class Meta:
         model = Payment
         fields = 'amount', 'debt', 'paid_date', 'notes'
