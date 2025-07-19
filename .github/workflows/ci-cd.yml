@@ -35,9 +35,9 @@ jobs:
           port: 22
           script: |
             cd /var/www/debt
-            git fetch origin
-            git reset --hard origin/master
-            git pull origin
+            git fetch origin2
+            git reset --hard origin2/master
+            git pull origin2
             source .venv/bin/activate
             pip install -r requirements.txt
             make mig
