@@ -39,7 +39,7 @@ jobs:
             git reset --hard origin2/master
             git pull origin2
             source .venv/bin/activate
-            pip install -r requirements.txt
+            pip install -r reqs.txt
             make mig
             sudo systemctl restart debt_project.service
             sudo systemctl enable debt_project.service

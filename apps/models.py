@@ -47,7 +47,7 @@ class Debt(Model):
     user = ForeignKey('authentication.User', CASCADE, related_name='debts')
     contact = ForeignKey('apps.Contact', CASCADE, related_name='debts')
     status = CharField(max_length=25, choices=StatusType.choices, default=StatusType.ACTIVE)
-    left_amount = DecimalField(max_digits=15, decimal_places=0)
+    left_amount = DecimalField(max_digits=15, decimal_places=0 , null=True, blank=True)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now=True)
 
